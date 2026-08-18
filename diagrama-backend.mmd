@@ -1,0 +1,225 @@
+classDiagram
+    class Role {
+        <<enumeration>>
+        ORGANIZER
+        CLIENT
+        DOOR
+    }
+
+    class User {
+        +id: int
+        +email: str
+        +password: str
+        +role: Role
+        +is_active: bool
+        +date_joined: datetime
+        +has_role(role): bool
+    }
+
+    class OrganizerProfile {
+        +user: User [1:1]
+        +organization_name: str
+        +phone: str
+        +document: str
+    }
+
+    class ClientProfile {
+        +user: User [1:1]
+        +cpf: str
+        +phone: str
+        +birth_date: date
+    }
+
+    class DoorProfile {
+        +user: User [1:1]
+        +assigned_events: Event[] [M2M]
+        +code: str
+    }
+
+    class ExternalShow {
+        +external_id: str
+        +title: str
+        +description: str
+        +category: str
+        +poster_url: str
+        +source: str
+        +normalized_data(): dict
+    }
+
+    class Venue {
+        +name: str
+        +address: str
+        +layout_type: str
+        +sections: Section[]
+    }
+
+    class Section {
+        +venue: Venue [FK]
+        +name: str
+        +capacity: int
+        +pricing_type: str
+        +price_multiplier: float
+    }
+
+    class Seat {
+        +section: Section [FK]
+        +row: str
+        +number: str
+        +status: str
+        +is_available(): bool
+    }
+
+    class Event {
+        +organizer: OrganizerProfile [FK]
+        +show: ExternalShow [FK]
+        +venue: Venue [FK]
+        +datetime: datetime
+        +base_price: Decimal
+        +status: str
+        +published_at: datetime
+        +publish()
+        +available_seats(): int
+        +is_sold_out(): bool
+    }
+
+    class Reservation {
+        +client: ClientProfile [FK]
+        +event: Event [FK]
+        +seats: Seat[] [M2M]
+        +quantity: int
+        +status: str
+        +expires_at: datetime
+        +created_at: datetime
+        +total_amount(): Decimal
+        +confirm(): bool
+        +cancel(): bool
+        +release_seats()
+    }
+
+    class Payment {
+        +reservation: Reservation [FK]
+        +amount: Decimal
+        +status: str
+        +method: str
+        +transaction_id: str
+        +processed_at: datetime
+        +simulate_approval(): bool
+        +simulate_refusal(): bool
+    }
+
+    class Ticket {
+        +reservation: Reservation [FK]
+        +seat: Seat [FK]
+        +ticket_code: str [unique]
+        +qr_hash: str
+        +status: str
+        +created_at: datetime
+        +used_at: datetime
+        +generate_qr(): bytes
+        +is_valid(): bool
+        +mark_used(door_user): bool
+    }
+
+    class ValidationLog {
+        +ticket: Ticket [FK]
+        +validated_by: DoorProfile [FK]
+        +validated_at: datetime
+        +result: str
+        +message: str
+    }
+
+    class ShareLink {
+        +ticket: Ticket [FK]
+        +token: str [unique]
+        +expires_at: datetime
+        +max_uses: int
+        +is_valid(): bool
+        +redeem(): Ticket
+    }
+
+    class ExternalApiService {
+        +search_shows(query, source): ExternalShow[]
+        +fetch_show_details(external_id): ExternalShow
+        +sync_catalog()
+    }
+
+    class QRSecurityService {
+        +generate_signed_code(ticket): str
+        +verify_signed_code(code): Ticket
+        +is_tampered(code): bool
+    }
+
+    class SeatLockService {
+        +lock_seats(seats, reservation): bool
+        +unlock_seats(reservation)
+        +is_double_sale(seats): bool
+    }
+
+    class EventViewSet {
+        +list()
+        +retrieve()
+        +create()
+        +update()
+        +publish()
+        +search()
+    }
+
+    class TicketViewSet {
+        +list()
+        +retrieve()
+        +my_tickets()
+        +share()
+        +validate()
+    }
+
+    class ReservationViewSet {
+        +create()
+        +confirm()
+        +cancel()
+    }
+
+    class PaymentViewSet {
+        +process()
+        +refuse()
+    }
+
+    class AuthViewSet {
+        +login()
+        +register()
+        +me()
+    }
+
+    class ExternalShowViewSet {
+        +search()
+        +sync()
+    }
+
+    User "1" -- "0..1" OrganizerProfile : profile
+    User "1" -- "0..1" ClientProfile : profile
+    User "1" -- "0..1" DoorProfile : profile
+    User ..> Role : uses
+
+    OrganizerProfile "1" -- "*" Event : creates
+    ExternalShow "1" -- "*" Event : based on
+    Venue "1" -- "*" Section : has
+    Section "1" -- "*" Seat : contains
+    Event "1" -- "*" Reservation : receives
+    ClientProfile "1" -- "*" Reservation : makes
+    Reservation "*" -- "*" Seat : reserves
+    Reservation "1" -- "1" Payment : generates
+    Reservation "1" -- "*" Ticket : emits
+    Seat "1" -- "0..1" Ticket : assigned to
+    Ticket "1" -- "*" ValidationLog : logs
+    DoorProfile "1" -- "*" ValidationLog : validates
+    Ticket "1" -- "*" ShareLink : shared by
+
+    EventViewSet ..> Event : manages
+    TicketViewSet ..> Ticket : manages
+    ReservationViewSet ..> Reservation : manages
+    PaymentViewSet ..> Payment : manages
+    AuthViewSet ..> User : manages
+    ExternalShowViewSet ..> ExternalShow : manages
+
+    QRSecurityService ..> Ticket : signs/verifies
+    SeatLockService ..> Seat : locks
+    ExternalApiService ..> ExternalShow : populates
