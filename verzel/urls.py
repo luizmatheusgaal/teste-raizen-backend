@@ -4,9 +4,12 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
+from core import views as core_views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/v1/', include([
+        path('', core_views.api_root, name='api-root'),
         path('health/', include('core.urls')),
         path('users/', include('users.urls')),
         path('', include('events.urls')),
