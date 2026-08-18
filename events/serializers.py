@@ -1,3 +1,4 @@
+from django.utils import timezone
 from rest_framework import serializers
 
 from .models import Category, Venue, Event
@@ -33,3 +34,19 @@ class EventSerializer(serializers.ModelSerializer):
             'starts_at', 'ends_at', 'min_age', 'info', 'created_at', 'updated_at'
         ]
         read_only_fields = ['organizer', 'created_at', 'updated_at']
+
+    def validate(self, data):
+        starts_at = data.get('starts_at')
+        ends_at = data.get('ends_at')
+
+        if starts_at and starts_at < timezone.now():
+            raise serializers.ValidationError(
+                {'starts_at': 'A data de início não pode estar no passado.'}
+            )
+
+        if starts_at and ends_at and ends_at <= starts_at:
+            raise serializers.ValidationError(
+                {'ends_at': 'A data de término deve ser posterior à data de início.'}
+            )
+
+        return data

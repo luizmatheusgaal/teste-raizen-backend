@@ -1,10 +1,22 @@
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, serializers
 from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.response import Response
 
 from .models import User
 from .serializers import UserSerializer, UserCreateSerializer
+
+
+class FriendlyAuthTokenSerializer(AuthTokenSerializer):
+    def validate(self, attrs):
+        try:
+            return super().validate(attrs)
+        except serializers.ValidationError:
+            raise serializers.ValidationError(
+                {'detail': 'E-mail ou senha incorretos.'},
+                code='authorization'
+            )
 
 
 class RegisterView(generics.CreateAPIView):
@@ -21,6 +33,8 @@ class RegisterView(generics.CreateAPIView):
 
 
 class LoginView(ObtainAuthToken):
+    serializer_class = FriendlyAuthTokenSerializer
+
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
         token = Token.objects.get(key=response.data['token'])
