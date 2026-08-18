@@ -5,12 +5,16 @@ from .models import TicketType, Ticket
 from .serializers import TicketTypeSerializer, TicketSerializer
 
 
-class TicketTypeViewSet(viewsets.ReadOnlyModelViewSet):
+class TicketTypeViewSet(viewsets.ModelViewSet):
     queryset = TicketType.objects.all()
     serializer_class = TicketTypeSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ['event']
-    permission_classes = [permissions.AllowAny]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
 
 
 class TicketViewSet(viewsets.ReadOnlyModelViewSet):
