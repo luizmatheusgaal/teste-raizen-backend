@@ -8,6 +8,7 @@ API RESTful Django para plataforma de eventos, ingressos e portaria.
 - Django REST Framework
 - PostgreSQL (via Docker)
 - Docker e Docker Compose
+- drf-spectacular (Swagger/OpenAPI)
 - pytest-django
 
 ## Como executar
@@ -15,11 +16,16 @@ API RESTful Django para plataforma de eventos, ingressos e portaria.
 ### Com Docker
 
 ```bash
-docker-compose up -d db
-docker-compose up -d web
+docker compose up -d
 ```
 
 A API estará disponível em `http://localhost:8000/api/v1/`.
+
+Para recriar a imagem após mudanças:
+
+```bash
+docker compose up -d --build
+```
 
 ### Localmente (desenvolvimento)
 
@@ -39,11 +45,12 @@ python manage.py runserver
 python -m pytest
 
 # docker
- docker compose --profile test run --rm test
+docker compose --profile test run --rm test
 ```
 
 ## Endpoints principais
 
+- `GET /api/v1/` - Raiz da API (lista endpoints)
 - `GET /api/v1/health/` - Health check
 - `POST /api/v1/users/register/` - Cadastro
 - `POST /api/v1/users/login/` - Login
@@ -52,3 +59,5 @@ python -m pytest
 - `POST /api/v1/orders/` - Criar pedido
 - `POST /api/v1/orders/{id}/pay/` - Pagar pedido
 - `POST /api/v1/validate/` - Validar ingresso
+- `GET /api/docs/` - Swagger UI
+- `GET /api/redoc/` - ReDoc
