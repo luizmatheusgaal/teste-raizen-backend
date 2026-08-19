@@ -9,5 +9,6 @@ urlpatterns = [
         path('health/', include('core.urls')),
         path('users/', include('users.urls')),
         path('', include('events.urls')),
+        path('', include('tickets.urls')),
     ])),
 ]
