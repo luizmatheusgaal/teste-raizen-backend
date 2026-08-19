@@ -15,5 +15,5 @@ class TicketTypeSerializer(serializers.ModelSerializer):
 class TicketSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ticket
-        fields = ['id', 'ticket_type', 'owner', 'code', 'sector', 'seat', 'status', 'price_paid', 'created_at']
+        fields = ['id', 'ticket_type', 'owner', 'order', 'code', 'sector', 'seat', 'status', 'price_paid', 'created_at']
         read_only_fields = ['code', 'created_at']

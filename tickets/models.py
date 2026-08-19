@@ -33,6 +33,7 @@ class Ticket(models.Model):
 
     ticket_type = models.ForeignKey(TicketType, on_delete=models.CASCADE, related_name='tickets')
     owner = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='tickets', null=True, blank=True)
+    order = models.ForeignKey('orders.Order', on_delete=models.CASCADE, related_name='tickets', null=True, blank=True)
     code = models.CharField(max_length=50, unique=True)
     sector = models.CharField(max_length=100, blank=True)
     seat = models.CharField(max_length=20, blank=True)
