@@ -4,6 +4,8 @@ Django settings for Verzel Events backend.
 
 import json
 from pathlib import Path
+
+from celery.schedules import crontab
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -139,3 +141,24 @@ CORS_ALLOW_HEADERS = [
     'content-type',
     'x-requested-with',
 ]
+
+# Celery
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', default='redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', default='redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = True
+CELERY_BEAT_SCHEDULE = {
+    'import-ticketmaster-events-daily': {
+        'task': 'events.tasks.import_ticketmaster_events',
+        'schedule': crontab(hour=6, minute=0),
+    },
+}
+
+TICKETMASTER_API_KEY = config('TICKETMASTER_API_KEY', default='')
+TICKETMASTER_DISCOVERY_URL = config(
+    'TICKETMASTER_DISCOVERY_URL',
+    default='https://app.ticketmaster.com/discovery/v2/events'
+)
