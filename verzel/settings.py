@@ -2,6 +2,7 @@
 Django settings for Verzel Events backend.
 """
 
+import json
 from pathlib import Path
 from decouple import config
 
@@ -75,6 +76,7 @@ DATABASES = {
         'PASSWORD': config('DB_PASSWORD', default=''),
         'HOST': config('DB_HOST', default=''),
         'PORT': config('DB_PORT', default=''),
+        'OPTIONS': json.loads(config('DB_OPTIONS', default='{}')),
     }
 }
 
