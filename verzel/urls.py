@@ -11,5 +11,6 @@ urlpatterns = [
         path('', include('events.urls')),
         path('', include('tickets.urls')),
         path('', include('orders.urls')),
+        path('', include('validation.urls')),
     ])),
 ]

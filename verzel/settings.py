@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'events',
     'tickets',
     'orders',
+    'validation',
 ]
 
 MIDDLEWARE = [
