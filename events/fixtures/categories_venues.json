@@ -1,0 +1,176 @@
+[
+{
+  "model": "events.category",
+  "pk": 1,
+  "fields": {
+    "name": "Show",
+    "slug": "show"
+  }
+},
+{
+  "model": "events.category",
+  "pk": 2,
+  "fields": {
+    "name": "Festival",
+    "slug": "festival"
+  }
+},
+{
+  "model": "events.category",
+  "pk": 3,
+  "fields": {
+    "name": "Teatro",
+    "slug": "teatro"
+  }
+},
+{
+  "model": "events.category",
+  "pk": 4,
+  "fields": {
+    "name": "Cinema",
+    "slug": "cinema"
+  }
+},
+{
+  "model": "events.category",
+  "pk": 5,
+  "fields": {
+    "name": "Esporte",
+    "slug": "esporte"
+  }
+},
+{
+  "model": "events.category",
+  "pk": 6,
+  "fields": {
+    "name": "Stand-up",
+    "slug": "stand-up"
+  }
+},
+{
+  "model": "events.category",
+  "pk": 7,
+  "fields": {
+    "name": "Exposição",
+    "slug": "exposicao"
+  }
+},
+{
+  "model": "events.category",
+  "pk": 8,
+  "fields": {
+    "name": "Infantil",
+    "slug": "infantil"
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 1,
+  "fields": {
+    "name": "Allianz Parque",
+    "address": "Av. Francisco Matarazzo, 1705",
+    "city": "São Paulo",
+    "state": "SP",
+    "capacity": 55000
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 2,
+  "fields": {
+    "name": "Neo Química Arena",
+    "address": "Av. Miguel Ignácio Curi, 111",
+    "city": "São Paulo",
+    "state": "SP",
+    "capacity": 48000
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 3,
+  "fields": {
+    "name": "Maracanã",
+    "address": "Av. Pres. Castelo Branco, Portão 3",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "capacity": 78000
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 4,
+  "fields": {
+    "name": "Estádio Nilton Santos",
+    "address": "Rua José dos Reis, 425",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "capacity": 45000
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 5,
+  "fields": {
+    "name": "Teatro Municipal",
+    "address": "Praça Ramos de Azevedo, s/n",
+    "city": "São Paulo",
+    "state": "SP",
+    "capacity": 1500
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 6,
+  "fields": {
+    "name": "Cinemark Shopping Eldorado",
+    "address": "Av. Rebouças, 3970",
+    "city": "São Paulo",
+    "state": "SP",
+    "capacity": 800
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 7,
+  "fields": {
+    "name": "Ginásio Ibirapuera",
+    "address": "Av. Quarto Centenário, 1268",
+    "city": "São Paulo",
+    "state": "SP",
+    "capacity": 11000
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 8,
+  "fields": {
+    "name": "Auditório do MASP",
+    "address": "Av. Paulista, 1578",
+    "city": "São Paulo",
+    "state": "SP",
+    "capacity": 400
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 9,
+  "fields": {
+    "name": "Estádio Beira-Rio",
+    "address": "Av. Padre Cacique, 891",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "capacity": 50000
+  }
+},
+{
+  "model": "events.venue",
+  "pk": 10,
+  "fields": {
+    "name": "Arena Castelão",
+    "address": "Av. 13 de Maio, s/n",
+    "city": "Fortaleza",
+    "state": "CE",
+    "capacity": 63000
+  }
+}
+]
