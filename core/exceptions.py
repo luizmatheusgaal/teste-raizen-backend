@@ -12,7 +12,6 @@ MESSAGE_OVERRIDES = {
     'not_authenticated': 'Você precisa fazer login para acessar este recurso.',
     'permission_denied': 'Você não tem permissão para realizar esta ação.',
     'invalid': 'Sua sessão é inválida. Faça login novamente.',
-    'no_active_account': 'E-mail ou senha incorretos.',
     'unable_to_login': 'E-mail ou senha incorretos.',
 }
 
@@ -23,22 +22,26 @@ def friendly_exception_handler(exc, context):
         return response
 
     if isinstance(exc, (NotAuthenticated, AuthenticationFailed)):
-        response.data = {'detail': MESSAGE_OVERRIDES['authentication_failed']}
+        response.data = {'msg': MESSAGE_OVERRIDES['authentication_failed']}
         return response
 
     if isinstance(exc, PermissionDenied):
-        response.data = {'detail': MESSAGE_OVERRIDES['permission_denied']}
+        response.data = {'msg': MESSAGE_OVERRIDES['permission_denied']}
         return response
 
     if isinstance(exc, ValidationError):
-        response.data = _translate_validation_errors(response.data)
+        response.data = {'msg': _flatten_validation_errors(response.data)}
+        return response
 
-    if 'detail' in response.data:
-        detail = response.data['detail']
-        if isinstance(detail, list):
-            detail = detail[0]
-        if isinstance(detail, str):
-            response.data['detail'] = _translate_detail(detail)
+    detail = response.data.get('detail') if isinstance(response.data, dict) else None
+    if isinstance(detail, list):
+        detail = detail[0]
+    if isinstance(detail, str):
+        response.data = {'msg': _translate_detail(detail)}
+        return response
+
+    if isinstance(response.data, dict):
+        response.data = {'msg': _flatten_validation_errors(response.data)}
 
     return response
 
@@ -56,21 +59,30 @@ def _translate_detail(detail):
     return detail
 
 
-def _translate_validation_errors(data):
+def _flatten_validation_errors(data, prefix=''):
+    messages = []
     if isinstance(data, dict):
-        translated = {}
         for key, value in data.items():
-            translated[key] = _translate_validation_errors(value)
-        return translated
-    if isinstance(data, list):
-        return [_translate_validation_errors(item) for item in data]
-    if isinstance(data, str):
-        lower = data.lower()
-        if 'already exists' in lower or 'já existe' in lower:
-            return 'Já existe um registro com este valor.'
-        if 'this field' in lower:
-            return 'Este campo é obrigatório.'
-        if 'enter a valid email' in lower:
-            return 'Informe um e-mail válido.'
-        return data
-    return data
+            if isinstance(value, (dict, list)):
+                messages.append(_flatten_validation_errors(value, f'{prefix}{key}: '))
+            elif isinstance(value, str):
+                messages.append(f'{prefix}{_translate_validation_message(value)}')
+    elif isinstance(data, list):
+        for item in data:
+            messages.append(_flatten_validation_errors(item, prefix))
+    elif isinstance(data, str):
+        messages.append(f'{prefix}{_translate_validation_message(data)}')
+
+    cleaned = [m for m in messages if m]
+    return ' '.join(cleaned) if cleaned else 'Ocorreu um erro de validação.'
+
+
+def _translate_validation_message(message):
+    lower = message.lower()
+    if 'already exists' in lower or 'já existe' in lower:
+        return 'Já existe um registro com este valor.'
+    if 'this field' in lower and 'required' in lower:
+        return 'Este campo é obrigatório.'
+    if 'enter a valid email' in lower:
+        return 'Informe um e-mail válido.'
+    return message

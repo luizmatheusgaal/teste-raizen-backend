@@ -14,7 +14,7 @@ class FriendlyAuthTokenSerializer(AuthTokenSerializer):
             return super().validate(attrs)
         except serializers.ValidationError:
             raise serializers.ValidationError(
-                {'detail': 'E-mail ou senha incorretos.'},
+                {'msg': 'E-mail ou senha incorretos.'},
                 code='authorization'
             )
 
