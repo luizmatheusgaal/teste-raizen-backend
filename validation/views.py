@@ -19,7 +19,7 @@ def validate_ticket(request):
             result=Validation.Result.INVALID,
             message='Ingresso não encontrado',
         )
-        return Response({'valid': False, 'message': 'Ingresso não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'valid': False, 'msg': 'Ingresso não encontrado.'}, status=status.HTTP_404_NOT_FOUND)
 
     if ticket.status == Ticket.Status.USED:
         Validation.objects.create(
@@ -28,7 +28,7 @@ def validate_ticket(request):
             result=Validation.Result.USED,
             message='Ingresso já utilizado',
         )
-        return Response({'valid': False, 'message': 'Ingresso já utilizado.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'valid': False, 'msg': 'Ingresso já utilizado.'}, status=status.HTTP_400_BAD_REQUEST)
 
     if ticket.status != Ticket.Status.PAID:
         Validation.objects.create(
@@ -37,7 +37,7 @@ def validate_ticket(request):
             result=Validation.Result.INVALID,
             message='Ingresso não pago',
         )
-        return Response({'valid': False, 'message': 'Ingresso não pago.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'valid': False, 'msg': 'Ingresso não pago.'}, status=status.HTTP_400_BAD_REQUEST)
 
     ticket.status = Ticket.Status.USED
     ticket.save(update_fields=['status'])
@@ -50,7 +50,7 @@ def validate_ticket(request):
 
     return Response({
         'valid': True,
-        'message': 'Ingresso validado com sucesso.',
+        'msg': 'Ingresso validado com sucesso.',
         'ticket': {
             'code': ticket.code,
             'event': ticket.ticket_type.event.title,

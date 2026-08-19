@@ -21,7 +21,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     def pay(self, request, pk=None):
         order = self.get_object()
         if order.status == Order.Status.PAID:
-            return Response({'detail': 'Pedido já pago.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'msg': 'Pedido já pago.'}, status=status.HTTP_400_BAD_REQUEST)
 
         # Simulate payment gateway
         order.status = Order.Status.PAID
