@@ -36,6 +36,7 @@ def friendly_exception_handler(exc, context):
     detail = response.data.get('detail') if isinstance(response.data, dict) else None
     if isinstance(detail, list):
         detail = detail[0]
+
     if isinstance(detail, str):
         response.data = {'msg': _translate_detail(detail)}
         return response
@@ -48,30 +49,39 @@ def friendly_exception_handler(exc, context):
 
 def _translate_detail(detail):
     lower = detail.lower()
+
     if 'authentication credentials were not provided' in lower:
         return MESSAGE_OVERRIDES['not_authenticated']
+
     if 'invalid token' in lower:
         return MESSAGE_OVERRIDES['invalid']
+
     if 'impossível fazer login' in lower or 'unable to log in' in lower:
         return MESSAGE_OVERRIDES['unable_to_login']
+
     if 'not found' in lower or 'não encontrado' in lower:
         return 'Recurso não encontrado.'
+
     return detail
 
 
-def _flatten_validation_errors(data, prefix=''):
+def _flatten_validation_errors(data):
     messages = []
     if isinstance(data, dict):
-        for key, value in data.items():
+        print(data.items())
+        for _, value in data.items():
             if isinstance(value, (dict, list)):
-                messages.append(_flatten_validation_errors(value, f'{prefix}{key}: '))
+                messages.append(_flatten_validation_errors(value))
+
             elif isinstance(value, str):
-                messages.append(f'{prefix}{_translate_validation_message(value)}')
+                messages.append(_translate_validation_message(value))
+
     elif isinstance(data, list):
         for item in data:
-            messages.append(_flatten_validation_errors(item, prefix))
+            messages.append(_flatten_validation_errors(item))
+
     elif isinstance(data, str):
-        messages.append(f'{prefix}{_translate_validation_message(data)}')
+        messages.append(_translate_validation_message(data))
 
     cleaned = [m for m in messages if m]
     return ' '.join(cleaned) if cleaned else 'Ocorreu um erro de validação.'
@@ -81,8 +91,11 @@ def _translate_validation_message(message):
     lower = message.lower()
     if 'already exists' in lower or 'já existe' in lower:
         return 'Já existe um registro com este valor.'
+
     if 'this field' in lower and 'required' in lower:
         return 'Este campo é obrigatório.'
+
     if 'enter a valid email' in lower:
         return 'Informe um e-mail válido.'
+
     return message
