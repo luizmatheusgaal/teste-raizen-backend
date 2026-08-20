@@ -61,3 +61,26 @@ docker compose --profile test run --rm test
 - `POST /api/v1/validate/` - Validar ingresso
 - `GET /api/docs/` - Swagger UI
 - `GET /api/redoc/` - ReDoc
+
+## Celery e importação automática (Ticketmaster)
+
+O projeto utiliza Celery com Redis para tarefas assíncronas. A tarefa `events.tasks.import_ticketmaster_events` busca 10 eventos no Brasil na API da Ticketmaster todos os dias às 6h.
+
+```bash
+# Subir Redis, worker e beat junto com a API
+docker compose up -d
+
+# Ou manualmente (com Redis local rodando)
+celery -A verzel worker -l info
+celery -A verzel beat -l info
+```
+
+Configure a chave da API no `.env`:
+
+```env
+TICKETMASTER_API_KEY=sua_chave_aqui
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
+```
+
+> **Nota:** a Vercel não suporta workers Celery contínuos. Para produção, use um serviço separado (Railway, Render, ECS, etc.) ou o agendamento de cron da Vercel apontando para um endpoint que dispara a tarefa.

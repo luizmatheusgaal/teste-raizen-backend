@@ -17,6 +17,11 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
   web:
     build: .
     command: python manage.py runserver 0.0.0.0:8000
@@ -35,8 +40,55 @@ services:
       DB_PORT: 5432
       ALLOWED_HOSTS: localhost,127.0.0.1,0.0.0.0,teste-raizen-backend.vercel.app
       CORS_ALLOWED_ORIGINS: https://teste-raizen-frontend.vercel.app,http://localhost:5173,http://127.0.0.1:5173
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      TICKETMASTER_API_KEY: ${TICKETMASTER_API_KEY:-}
     depends_on:
       - db
+      - redis
+
+  celery-worker:
+    build: .
+    command: celery -A verzel worker -l info
+    volumes:
+      - .:/app
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-django-insecure-local}
+      DEBUG: "True"
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: verzel
+      DB_USER: verzel
+      DB_PASSWORD: verzel
+      DB_HOST: db
+      DB_PORT: 5432
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      TICKETMASTER_API_KEY: ${TICKETMASTER_API_KEY:-}
+    depends_on:
+      - db
+      - redis
+
+  celery-beat:
+    build: .
+    command: celery -A verzel beat -l info --scheduler celery.beat.PersistentScheduler
+    volumes:
+      - .:/app
+      - celerybeat_data:/app/celerybeat
+    environment:
+      SECRET_KEY: ${SECRET_KEY:-django-insecure-local}
+      DEBUG: "True"
+      DB_ENGINE: django.db.backends.postgresql
+      DB_NAME: verzel
+      DB_USER: verzel
+      DB_PASSWORD: verzel
+      DB_HOST: db
+      DB_PORT: 5432
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      TICKETMASTER_API_KEY: ${TICKETMASTER_API_KEY:-}
+    depends_on:
+      - db
+      - redis
 
   test:
     build: .
@@ -54,3 +106,4 @@ services:
 
 volumes:
   postgres_data:
+  celerybeat_data:
