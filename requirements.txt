@@ -39,6 +39,6 @@ six==1.17.0
 sqlparse==0.6.0
 tzdata==2026.3
 uritemplate==4.2.0
-urllib3==2.7.0
+urllib3==2.8.0
 vine==5.1.0
 wcwidth==0.8.2
